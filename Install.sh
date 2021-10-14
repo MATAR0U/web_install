@@ -1,5 +1,5 @@
 #!/bin/bash
-
+zf
 . fichier.conf
 
 # Verification if the current user is root (for all privileges)
