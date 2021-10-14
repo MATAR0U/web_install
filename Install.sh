@@ -23,10 +23,10 @@ boucleSSL(){
 		
 }
 
-# Definition of the loop to setup the update, upgrade and installation of the necessary packages
+# Definition of the loop to setup the installation of the necessary packages
 boucleInstall(){
-	# Update, upgrade and installation of the necessary packages
-	apt-get update -y && apt-get upgrade -y && apt-get install apache2 apache2-doc mariadb-server mariadb-client php php-apcu php-bcmath php-bz2 php-curl php-fpm php-gd php-geoip php-gmp php-imagick php-intl php-ldap php-mbstring php-memcached php-msgpack php-mysql php-pear php-soap php-xml php-xmlrpc php-zip libapache2-mod-php imagemagick net-tools wget -y && apt-get autoremove -y
+	# Installation of the necessary packages
+	apt-get install apache2 apache2-doc mariadb-server mariadb-client php php-apcu php-bcmath php-bz2 php-curl php-fpm php-gd php-geoip php-gmp php-imagick php-intl php-ldap php-mbstring php-memcached php-msgpack php-mysql php-pear php-soap php-xml php-xmlrpc php-zip libapache2-mod-php imagemagick net-tools wget -y && apt-get autoremove -y
 }
 
 # Definition of the loop to install Moodle
