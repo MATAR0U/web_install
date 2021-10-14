@@ -32,134 +32,6 @@ boucleInstall(){
 # Definition of the loop to install Moodle
 boucleMoodle(){
 		
-	# Get and initialise in variable the options after the command to execute the script
-	
-	required=0
-	
-	if [ "$1" = "-h" ] || [ "$1" = "--help" ]
-	then
-		if [[ "$2" =~ [A-Za-z0-9]* ]] || [ "$2" = "" ]
-		then
-			echo ""
-			echo "$this_is_setup :"
-			echo "$help_option"
-			echo "$database_option"
-			echo "$database_user_option"
-			echo "$database_password_option"
-			echo "$ip_option"
-			echo ""
-			exit
-		else
-			echo "$incorrect_setup"$1
-			echo "$user_help_option"
-		fi
-	fi
-	
-	number=$((($#/2)+1))
-	
-	while [ "$number" -gt 0 ]
-	do
-		if [ "$1" = "-d" ] || [ "$1" = "--data-base" ]
-		then
-			if [[ "$2" =~ [A-Za-z0-9]* ]]
-			then
-				dataname=$2
-				required=$(($required+1))
-				shift
-				shift
-			else
-				echo ""
-				echo "$incorrect_setup"$1
-				echo "$user_help_option"
-				echo ""
-				exit
-			fi
-		fi
-	
-		if [ "$1" = "-u" ] || [ "$1" = "--user" ]
-		then
-			if [[ "$2" =~ [A-Za-z0-9]* ]]
-				then
-					datauser=$2
-					required=$(($required+1))
-					shift
-					shift
-				else
-					echo ""
-					echo "$incorrect_setup"$1
-					echo "$user_help_option"
-					echo ""
-					exit
-				fi
-		fi
-	
-		if [ "$1" = "-p" ] || [ "$1" = "--password" ]
-		then
-			datapdw=$2
-			required=$(($required+1))
-			shift
-			shift
-		fi
-	
-		if [ "$1" = "--ip" ]
-		then
-			if [[ "$2" =~ [a-zA-Z0-9]* ]] || [ "$2" != "" ]
-			then
-				ip=$2
-				required=$(($required+1))
-				shift 2
-			else
-				echo ""
-				echo "$incorrect_setup"$1
-				echo "$user_help_option"
-				echo ""
-				exit
-			fi
-		fi
-		number=$(($number-1))
-	
-		if [ "$1" = "-i" ]
-		then
-			if [[ "$2" =~ [a-zA-Z0-9]* ]] || [ "$2" != "" ]
-			then
-				interfaces=$2
-				ip=$(ifconfig $interfaces | awk '/inet / {print $2}' | cut -d ':' -f2)
-				required=$(($required+1))
-				shift 2
-			else
-				echo ""
-				echo "$incorrect_setup"$1
-				echo "$user_help_option"
-				echo ""
-				exit
-			fi
-		fi
-		number=$(($number-1))
-	done
-	if [ "$required" -lt 4 ]
-	then
-		echo ""
-		echo "$option_required_blank"
-		echo "("$required "$option_requierd_blank1"
-		echo "$user_help_option"
-		echo ""
-		exit
-	fi
-	
-	echo ""
-	echo "$summary"
-	echo ""
-	echo "$name_database $dataname"
-	echo "$username $datauser"
-	echo "$password $datapdw"
-	echo "$resume_ip $ip"
-	echo ""
-	read -p "$correct_information " valide
-	if [ "$valide" != "o" ] && [ "$valide" != "O" ] && [ "$valide" != "y" ] && [ "$valide" != "Y"]
-	then
-		exit
-	fi
-	
 	read -p "$generate_ssl " ssl
 	if [ "$ssl" = "o" -o "$ssl" = "O" -o "$ssl" = "y" -o "$ssl" = "Y" ]; then
 		ssl="o"
@@ -220,37 +92,136 @@ boucleMoodle(){
 	fi
 }
 
-		
-#Installer moodle ou juste HTTPS
-boucleHTTPS(){
-	echo -n "Faut il installer moodle ou seulement le sécuriser en HTTPS (moodle / https) ? "
-	read https
-	if [ "$https" = "moodle" ]; then
-		boucleMoodle
-	elif [ "$https" = "https" ]; then
-		boucleip
-		#Recuperation de l'ip
-		ip=$(ifconfig $interfaces | awk '/inet / {print $2}' | cut -d ':' -f2)
-				
-		boucleSSL
-		boucleInstall
-		echo -n "\nQuel est le nom de la base de donnée ? "
-		read dataname
-		echo -n "\nQuel est l'utilisateur administrateur de $dataname ? "
-		read datauser
-		echo -n "\nQuel est le mot de passe de l'utilisateur $datauser ? "
-		read datapdw
-		touch /etc/apache2/sites-available/moodle.conf
-		echo "<VirtualHost *:80>\n   ServerName $ip\n   Redirect permanent / https://$ip/\n</VirtualHost>\n<VirtualHost *:443>\n   DocumentRoot /var/www/moodle/\n   ServerName $ip\n   <Directory /var/www/moodle/>\n        Options -Indexes +FollowSymlinks +MultiViews\n        AllowOverride None\n        Require all granted\n   </Directory>\n   ErrorLog /var/log/apache2/moodle.error.log\n   CustomLog /var/log/apache2/moodle.access.log combined\n   SSLEngine On\n   SSLOptions +FakeBasicAuth +ExportCertData +StrictRequire\n   SSLCertificateFile /etc/ssl/certs/moodle.crt\n   SSLCertificateKeyFile /etc/ssl/private/moodle.key\n</VirtualHost>\n" > /etc/apache2/sites-available/moodle.conf
-		a2dissite 000-default && a2ensite moodle && a2enmod ssl
-				
-		echo "<?php  // Moodle configuration file\nunset($CFG);\nglobal $CFG;\n$CFG = new stdClass();\n$CFG->dbtype    = 'mariadb';\n$CFG->dblibrary = 'native';\n$CFG->dbhost    = 'localhost';\n$CFG->dbname    = '$dataname';\n$CFG->dbuser    = '$datauser';\n$CFG->dbpass    = '$datapdw';\n$CFG->prefix    = 'mdl_';\n$CFG->dboptions = array (\n  'dbpersist' => 0,\n  'dbport' => '',\n  'dbsocket' => '',\n  'dbcollation' => 'utf8mb4_unicode_ci',\n);\n$CFG->wwwroot   = 'https://$ip';\n$CFG->dataroot  = '/home/moodle/moodledata';\n$CFG->admin     = 'admin';\n$CFG->directorypermissions = 0777;\nrequire_once(__DIR__ . '/lib/setup.php');\n// There is no php closing tag in this file,\n// it is intentional because it prevents trailing whitespace problems!" > /var/www/moodle/config.php
-			
-		chown -R root:www-data /var/www/moodle/ && chmod -R 0755 /var/www/moodle/
-		systemctl restart apache2 && systemctl restart mariadb
-		echo "\n\nVous pouvez maintenant acceder a Moodle a l'adresse suivant : https://$ip"
-	fi
-}
+# Get and initialise in variable the options after the command to execute the script
 
-#Execution des boucle
-boucleHTTPS
+required=0
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then
+	if [[ "$2" =~ [A-Za-z0-9]* ]] || [ "$2" = "" ]
+	then
+		echo ""
+		echo "$this_is_setup :"
+		echo "$help_option"
+		echo "$database_option"
+		echo "$database_user_option"
+		echo "$database_password_option"
+		echo "$ip_option"
+		echo ""
+		exit
+	else
+		echo "$incorrect_setup"$1
+		echo "$user_help_option"
+	fi
+fi
+
+number=$((($#/2)+1))
+
+while [ "$number" -gt 0 ]
+do
+	if [ "$1" = "-d" ] || [ "$1" = "--data-base" ]
+	then
+		if [[ "$2" =~ [A-Za-z0-9]* ]]
+		then
+			dataname=$2
+			required=$(($required+1))
+			shift
+			shift
+		else
+			echo ""
+			echo "$incorrect_setup"$1
+			echo "$user_help_option"
+			echo ""
+			exit
+		fi
+	fi
+
+	if [ "$1" = "-u" ] || [ "$1" = "--user" ]
+	then
+		if [[ "$2" =~ [A-Za-z0-9]* ]]
+		then
+			datauser=$2
+			required=$(($required+1))
+			shift
+			shift
+		else
+			echo ""
+			echo "$incorrect_setup"$1
+			echo "$user_help_option"
+			echo ""
+			exit
+		fi
+	fi
+
+	if [ "$1" = "-p" ] || [ "$1" = "--password" ]
+	then
+		datapdw=$2
+		required=$(($required+1))
+		shift
+		shift
+	fi
+
+	if [ "$1" = "--ip" ]
+	then
+		if [[ "$2" =~ [a-zA-Z0-9]* ]] || [ "$2" != "" ]
+		then
+			ip=$2
+			required=$(($required+1))
+			shift 2
+		else
+			echo ""
+			echo "$incorrect_setup"$1
+			echo "$user_help_option"
+			echo ""
+			exit
+		fi
+	fi
+	number=$(($number-1))
+
+	if [ "$1" = "-i" ]
+	then
+		if [[ "$2" =~ [a-zA-Z0-9]* ]] || [ "$2" != "" ]
+		then
+			interfaces=$2
+			ip=$(ifconfig $interfaces | awk '/inet / {print $2}' | cut -d ':' -f2)
+			required=$(($required+1))
+			shift 2
+		else
+			echo ""
+			echo "$incorrect_setup"$1
+			echo "$user_help_option"
+			echo ""
+			exit
+		fi
+	fi
+	number=$(($number-1))
+done
+if [ "$required" -lt 4 ]
+then
+	echo ""
+	echo "$option_required_blank"
+	echo "("$required "$option_requierd_blank1"
+	echo "$user_help_option"
+	echo ""
+	exit
+fi
+
+echo ""
+echo "$summary"
+echo ""
+echo "$name_database"
+echo "$dataname"
+echo "$username"
+echo "$datauser"
+echo "$password"
+echo "$datapdw"
+echo "$resume_ip"
+echo "$ip"
+echo ""
+read -p "$correct_information " valide
+if [ "$valide" != "o" ] && [ "$valide" != "O" ] && [ "$valide" != "y" ] && [ "$valide" != "Y"]
+then
+	exit
+fi
+	
+boucleMoodle
