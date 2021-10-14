@@ -62,7 +62,7 @@ boucleMoodle(){
 	sed -i 's/memory_limit = 128M/memory_limit = 96M/' "/etc/php/7.3/apache2/php.ini" && sed -i 's/;date.timezone =/date.timezone = "Europe/Paris"/' "/etc/php/7.3/apache2/php.ini" && sed -i 's/;opcache.enable=1/opcache.enable=1/' "/etc/php/7.3/apache2/php.ini"
 		
 	# Download Moodle
-	wget wget https://github.com/MATAR0U/web_install/raw/main/sources/moodle.tgz && tar xzvf moodle.tgz && mv moodle/ /var/www/
+	wget https://github.com/MATAR0U/web_install/raw/main/sources/moodle.tgz && tar xzvf moodle.tgz && mv moodle/ /var/www/
 		
 	# Create Moodle user for data
 	adduser --system moodle && mkdir /home/moodle/moodledata && chown -R www-data:www-data /home/moodle/moodledata/ && chmod 0777 /home/moodle/moodledata
