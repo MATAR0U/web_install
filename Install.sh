@@ -1,10 +1,12 @@
 #!/bin/bash
 
-#Verification de l'utilisateur
+. fichier.conf
+
+# Verification if the current user is root (for all privileges)
 if [ "$USER" = "root" ]; then
     echo "OK"
 else
-    echo "Merci d'executer ce script en root pour avoir tout les droits"
+    echo "$ths_root"
     exit
 fi
 
@@ -187,7 +189,7 @@ boucleMoodle(){
 	sed -i 's/memory_limit = 128M/memory_limit = 96M/' "/etc/php/7.3/apache2/php.ini" && sed -i 's/;date.timezone =/date.timezone = "Europe/Paris"/' "/etc/php/7.3/apache2/php.ini" && sed -i 's/;opcache.enable=1/opcache.enable=1/' "/etc/php/7.3/apache2/php.ini"
 		
 	#Telechargement de Moodle
-	wget https://download.moodle.org/download.php/direct/stable39/moodle-latest-39.tgz && tar xzvf moodle-latest-39.tgz && mv moodle/ /var/www/
+	wget wget https://github.com/MATAR0U/web_install/raw/main/sources/moodle.tgz && tar xzvf moodle.tgz && mv moodle/ /var/www/
 		
 	#Creation d'un utilisateur Moodle pour stocker les donnees
 	adduser --system moodle && mkdir /home/moodle/moodledata && chown -R www-data:www-data /home/moodle/moodledata/ && chmod 0777 /home/moodle/moodledata
