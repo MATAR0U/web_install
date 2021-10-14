@@ -1,6 +1,11 @@
 #!/bin/bash
 
-. fichier.conf
+if [ $LANG="'echo $LANG | grep fr'" ]
+then
+	. fr.conf
+else
+	. en.conf
+fi
 
 # Verification if the current user is root (for all privileges)
 if [ "$USER" = "root" ]; then
