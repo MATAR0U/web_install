@@ -111,6 +111,7 @@ then
     exit
 fi
 
+echo ""
 echo "Voici un resumer des informations"
 echo ""
 echo "Nom de la base de donnees : $dataname"
@@ -118,9 +119,8 @@ echo "Nom de l'utilisateur de la base de donnees : $datauser"
 echo "Mot de passe de l'utilisateur de la base de donnees: $datapdw"
 echo "Adresse IP avec laquel sera configurer le serveur : $ip"
 echo ""
-echo "Ces informations sont-elles correct ? (o/N) : "
-read valide
-if [ $valide = "n" ] || [ $valide = "N" ] || [ $valide = "" ]
+read -p "Ces informations sont-elles correct ? (o/N) : " valide
+if [ "$valide" = "n" ] || [ "$valide" = "N" ] || [ "$valide" = "" ]
 then
 	exit
 fi
