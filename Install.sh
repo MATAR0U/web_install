@@ -140,6 +140,7 @@ boucleMoodle(){
 	then
 		echo ""
 		echo "$option_required_blank"
+		echo "("$required "$option_requierd_blank1"
 		echo "$user_help_option"
 		echo ""
 		exit
