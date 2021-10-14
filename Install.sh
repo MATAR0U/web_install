@@ -209,17 +209,18 @@ fi
 echo ""
 echo "$summary"
 echo ""
-echo "$name_database"
-echo "$dataname"
-echo "$username"
-echo "$datauser"
-echo "$password"
-echo "$datapdw"
-echo "$resume_ip"
-echo "$ip"
+echo -e "$name_database"
+echo -e "${light_green}$dataname${neutral}"
+echo -e "$username"
+echo -e "${light_green}$datauser${neutral}"
+echo -e "$password"
+echo -e "${light_green}$datapdw${neutral}"
+echo -e "$resume_ip"
+echo -e "${light_green}$ip${neutral}"
 echo ""
-read -p "$correct_information " valide
-if [ "$valide" != "o" ] && [ "$valide" != "O" ] && [ "$valide" != "y" ] && [ "$valide" != "Y"]
+echo $correct_information
+read valide
+if [ "$valide" != "o" ] && [ "$valide" != "O" ] && [ "$valide" != "y" ] && [ "$valide" != "Y" ]
 then
 	exit
 fi
