@@ -10,10 +10,10 @@ else
     exit
 fi
 
-#Definition de la variable $CFG
+# Definition of the variable CFG to $CFG
 CFG='$CFG'
 
-#Definition de la boucle pour choisir ou non de securiser le site en HTTPS
+# Definition of the loop to choose or not to secure the site in HTTPS
 boucleSSL(){
 
 	apt-get update -y && apt-get install openssl -y
@@ -23,35 +23,35 @@ boucleSSL(){
 		
 }
 
-#Definition de la boucle installation
+# Definition of the loop to setup the update, upgrade and installation of the necessary packages
 boucleInstall(){
-	#Installation de tous les composants utiles
+	# Update, upgrade and installation of the necessary packages
 	apt-get update -y && apt-get upgrade -y && apt-get install apache2 apache2-doc mariadb-server mariadb-client php php-apcu php-bcmath php-bz2 php-curl php-fpm php-gd php-geoip php-gmp php-imagick php-intl php-ldap php-mbstring php-memcached php-msgpack php-mysql php-pear php-soap php-xml php-xmlrpc php-zip libapache2-mod-php imagemagick net-tools wget -y && apt-get autoremove -y
 }
 
-#Definition de la boucle Moodle
+# Definition of the loop to install Moodle
 boucleMoodle(){
 		
-	#Lancement des boucles
+	# Get and initialise in variable the options after the command to execute the script
 	
-	obligatoire=0
+	required=0
 	
 	if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 	then
 		if [[ "$2" =~ [A-Za-z0-9]* ]] || [ "$2" = "" ]
 		then
 			echo ""
-			echo "Voici les parametres :"
-			echo "-h OU --help : affiche les aides"
-			echo "[OBLIGATOIRE] -d OU --data-base : specifie le nom de la base de donnees"
-			echo "[OBLIGATOIRE] -u OU --user: specifie le nom de l'utitilisateur"
-			echo "[OBLIGATOIRE] -p OU --password : specifie le mot de passe de l'utilisateur de la base de donnee"
-			echo "[OBLIGATOIRE] -i OU --ip : specifie l'interface reseaux a utiliser OU l'adresse IP (v4 ou v6)"
+			echo "$this_is_setup :"
+			echo "$help_option"
+			echo "$database_option"
+			echo "$database_user_option"
+			echo "$database_password_option"
+			echo "$ip_option"
 			echo ""
 			exit
 		else
-			echo "Parametre incorrect pour "$1
-			echo "Utiliser l'option -h ou --help pour afficher les options"
+			echo "$incorrect_setup"$1
+			echo "$user_help_option"
 		fi
 	fi
 	
@@ -64,13 +64,13 @@ boucleMoodle(){
 			if [[ "$2" =~ [A-Za-z0-9]* ]]
 			then
 				dataname=$2
-				obligatoire=$(($obligatoire+1))
+				required=$(($required+1))
 				shift
 				shift
 			else
 				echo ""
-				echo "Parametre incorrect pour "$1
-				echo "Utiliser l'option -h ou --help pour afficher les options"
+				echo "$incorrect_setup"$1
+				echo "$user_help_option"
 				echo ""
 				exit
 			fi
@@ -81,13 +81,13 @@ boucleMoodle(){
 			if [[ "$2" =~ [A-Za-z0-9]* ]]
 				then
 					datauser=$2
-					obligatoire=$(($obligatoire+1))
+					required=$(($required+1))
 					shift
 					shift
 				else
 					echo ""
-					echo "Parametre incorrect pour "$1
-					echo "Utiliser l'option -h ou --help pour afficher les options"
+					echo "$incorrect_setup"$1
+					echo "$user_help_option"
 					echo ""
 					exit
 				fi
@@ -96,7 +96,7 @@ boucleMoodle(){
 		if [ "$1" = "-p" ] || [ "$1" = "--password" ]
 		then
 			datapdw=$2
-			obligatoire=$(($obligatoire+1))
+			required=$(($required+1))
 			shift
 			shift
 		fi
@@ -106,12 +106,12 @@ boucleMoodle(){
 			if [[ "$2" =~ [a-zA-Z0-9]* ]] || [ "$2" != "" ]
 			then
 				ip=$2
-				obligatoire=$(($obligatoire+1))
+				required=$(($required+1))
 				shift 2
 			else
 				echo ""
-				echo "Parametre incorrect pour "$1
-				echo "Utiliser l'option -h ou --help pour afficher les options"
+				echo "$incorrect_setup"$1
+				echo "$user_help_option"
 				echo ""
 				exit
 			fi
@@ -124,55 +124,55 @@ boucleMoodle(){
 			then
 				interfaces=$2
 				ip=$(ifconfig $interfaces | awk '/inet / {print $2}' | cut -d ':' -f2)
-				obligatoire=$(($obligatoire+1))
+				required=$(($required+1))
 				shift 2
 			else
 				echo ""
-				echo "Parametre incorrect pour "$1
-				echo "Utiliser l'option -h ou --help pour afficher les options"
+				echo "$incorrect_setup"$1
+				echo "$user_help_option"
 				echo ""
 				exit
 			fi
 		fi
 		number=$(($number-1))
 	done
-	if [ "$obligatoire" -lt 4 ]
+	if [ "$required" -lt 4 ]
 	then
 		echo ""
-		echo "Certaines options obligatoire ne sont pas renseigner correctement ($obligatoire sur 4)"
-		echo "Utiliser l'option -h ou --help pour afficher les options"
+		echo "$option_required_blank"
+		echo "$user_help_option"
 		echo ""
 		exit
 	fi
 	
 	echo ""
-	echo "Voici un resumer des informations"
+	echo "$summary"
 	echo ""
-	echo "Nom de la base de donnees : $dataname"
-	echo "Nom de l'utilisateur de la base de donnees : $datauser"
-	echo "Mot de passe de l'utilisateur de la base de donnees: $datapdw"
-	echo "Adresse IP avec laquel sera configurer le serveur : $ip"
+	echo "$name_database $dataname"
+	echo "$username $datauser"
+	echo "$password $datapdw"
+	echo "$resume_ip $ip"
 	echo ""
-	read -p "Ces informations sont-elles correct ? (o/N) : " valide
-	if [ "$valide" = "n" ] || [ "$valide" = "N" ] || [ "$valide" = "" ]
+	read -p "$correct_information " valide
+	if [ "$valide" != "o" ] && [ "$valide" != "O" ] && [ "$valide" != "y" ] && [ "$valide" != "Y"]
 	then
 		exit
 	fi
 	
-	echo -n "Faut il generer une cle SSL (o/N) ? "
-	read ssl
-	if [ "$ssl" = "o" -o "$ssl" = "O" ]; then
+	read -p "$generate_ssl " ssl
+	if [ "$ssl" = "o" -o "$ssl" = "O" -o "$ssl" = "y" -o "$ssl" = "Y" ]; then
+		ssl="o"
 		boucleSSL
 	fi
 	boucleInstall
 		
-	#Creation et configuration de la base de donnee
+	# Create database and user
 	mysql -u root -e "CREATE DATABASE IF NOT EXISTS $dataname CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 	mysql -u root -e "CREATE USER $datauser@localhost IDENTIFIED BY '$datapdw';"
 	mysql -u root -e "GRANT ALL PRIVILEGES ON $dataname.* TO $datauser@localhost;"
 	mysql -u root -e "FLUSH PRIVILEGES;"
 		
-	#Creation de la configuration apache minimal
+	# Create minimal configuration of apache
 	if [ "$ssl" = "o" -o "$ssl" = "O" ]; then
 		touch /etc/apache2/sites-available/moodle.conf
 		echo "<VirtualHost *:80>\n   ServerName $ip\n   Redirect permanent / https://$ip/\n</VirtualHost>\n<VirtualHost *:443>\n   DocumentRoot /var/www/moodle/\n   ServerName $ip\n   <Directory /var/www/moodle/>\n        Options -Indexes +FollowSymlinks +MultiViews\n        AllowOverride None\n        Require all granted\n   </Directory>\n   ErrorLog /var/log/apache2/moodle.error.log\n   CustomLog /var/log/apache2/moodle.access.log combined\n   SSLEngine On\n   SSLOptions +FakeBasicAuth +ExportCertData +StrictRequire\n   SSLCertificateFile /etc/ssl/certs/moodle.crt\n   SSLCertificateKeyFile /etc/ssl/private/moodle.key\n</VirtualHost>\n" > /etc/apache2/sites-available/moodle.conf
@@ -183,18 +183,18 @@ boucleMoodle(){
 		a2dissite 000-default && a2ensite moodle
 	fi
 		
-	#Configuration de PHP
+	# Configuration of PHP
 	echo "\nopcache.memory_consumption=128\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=16229\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\nopcache.enable_cli=1" >> /etc/php/7.3/mods-available/opcache.ini
 		
 	sed -i 's/memory_limit = 128M/memory_limit = 96M/' "/etc/php/7.3/apache2/php.ini" && sed -i 's/;date.timezone =/date.timezone = "Europe/Paris"/' "/etc/php/7.3/apache2/php.ini" && sed -i 's/;opcache.enable=1/opcache.enable=1/' "/etc/php/7.3/apache2/php.ini"
 		
-	#Telechargement de Moodle
+	# Download Moodle
 	wget wget https://github.com/MATAR0U/web_install/raw/main/sources/moodle.tgz && tar xzvf moodle.tgz && mv moodle/ /var/www/
 		
-	#Creation d'un utilisateur Moodle pour stocker les donnees
+	# Create Moodle user for data
 	adduser --system moodle && mkdir /home/moodle/moodledata && chown -R www-data:www-data /home/moodle/moodledata/ && chmod 0777 /home/moodle/moodledata
 		
-	#Creation du fichier de configuration enter le site et la base de donnee de Moodle
+	# Create the file for the configuration of database in the site
 	touch /var/www/moodle/config.php
 	if [ "$ssl" = "o" -o "$ssl" = "O" ]; then
 		echo "<?php  // Moodle configuration file\nunset($CFG);\nglobal $CFG;\n$CFG = new stdClass();\n$CFG->dbtype    = 'mariadb';\n$CFG->dblibrary = 'native';\n$CFG->dbhost    = 'localhost';\n$CFG->dbname    = '$dataname';\n$CFG->dbuser    = '$datauser';\n$CFG->dbpass    = '$datapdw';\n$CFG->prefix    = 'mdl_';\n$CFG->dboptions = array (\n  'dbpersist' => 0,\n  'dbport' => '',\n  'dbsocket' => '',\n  'dbcollation' => 'utf8mb4_unicode_ci',\n);\n$CFG->wwwroot   = 'https://$ip';\n$CFG->dataroot  = '/home/moodle/moodledata';\n$CFG->admin     = 'admin';\n$CFG->directorypermissions = 0777;\nrequire_once(__DIR__ . '/lib/setup.php');\n// There is no php closing tag in this file,\n// it is intentional because it prevents trailing whitespace problems!" > /var/www/moodle/config.php
@@ -205,17 +205,17 @@ boucleMoodle(){
 		
 	echo "\n[mysqld]\ncharacter-set-client-handshake = FALSE\ncharacter-set-server = utf8mb4\ncollation-server = utf8mb4_unicode_ci" >> /etc/mysql/my.cnf
 		
-	#Modification des permissions
+	# Configuration of permissions
 	chown -R root:www-data /var/www/moodle/ && chmod -R 0755 /var/www/moodle/
 		
-	#Redemarrage
+	# Restart service
 	systemctl restart apache2 && systemctl restart mariadb
 		
-	#Fin
-	if [ "$ssl" = "o" -o "$ssl" = "O" ]; then
-		echo "\n\nVous pouvez maintenant acceder a Moodle a l'adresse suivant : https://$ip"
+	# End
+	if [ "$ssl" = "o" ]; then
+		echo "\n\n$end_address https://$ip"
 	else
-		echo "\n\nVous pouvez maintenant acceder a Moodle a l'adresse suivant : http://$ip"
+		echo "\n\n$end_address http://$ip"
 	fi
 }
 
