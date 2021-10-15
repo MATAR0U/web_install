@@ -89,9 +89,11 @@ boucleMoodle(){
 		
 	# End
 	if [ "$ssl" = "o" ]; then
-		echo "\n\n$end_address https://$ip"
+		echo "\n\n$end_address"
+		echo -e "${light_green}https://$ip${neutral}"
 	else
-		echo "\n\n$end_address http://$ip"
+		echo "\n\n$end_address"
+		echo -e "${light_green}http://$ip${neutral}"
 	fi
 }
 
