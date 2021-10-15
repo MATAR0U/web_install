@@ -8,9 +8,7 @@ else
 fi
 
 # Verification if the current user is root (for all privileges)
-if [ "$USER" = "root" ]; then
-    echo "OK"
-else
+if [ "$USER" != "root" ]; then
     echo "$ths_root"
     exit
 fi
