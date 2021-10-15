@@ -98,23 +98,27 @@ boucleMoodle(){
 # Get and initialise in variable the options after the command to execute the script
 
 required=0
+rgxIP='^[0-9.]+$'
+rgx='^[a-zA-Z0-9._]+$'
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 then
-	if [[ "$2" =~ [A-Za-z0-9]* ]] || [ "$2" = "" ]
+	if [ $(grep " " <<<$2) ] || [ "$2" = "" ]
 	then
 		echo ""
-		echo "$this_is_setup :"
-		echo "$help_option"
-		echo "$database_option"
-		echo "$database_user_option"
-		echo "$database_password_option"
-		echo "$ip_option"
+		echo $this_is_setup
+		echo $help_option
+		echo $database_option
+		echo $database_user_option
+		echo $database_password_option
+		echo $ip_option
 		echo ""
 		exit
 	else
-		echo "$incorrect_setup"$1
-		echo "$user_help_option"
+		echo ""
+		echo $incorrect_setup
+		echo -e "${light_green}$1${neutral}"
+		echo $user_help_option
 	fi
 fi
 
@@ -124,7 +128,7 @@ while [ "$number" -gt 0 ]
 do
 	if [ "$1" = "-d" ] || [ "$1" = "--data-base" ]
 	then
-		if [[ "$2" =~ [A-Za-z0-9]* ]]
+		if [[ "$2" =~ $rgx ]]
 		then
 			dataname=$2
 			required=$(($required+1))
@@ -132,8 +136,9 @@ do
 			shift
 		else
 			echo ""
-			echo "$incorrect_setup"$1
-			echo "$user_help_option"
+			echo  $incorrect_setup
+			echo -e "${light_green}$1${neutral}"
+			echo  $user_help_option
 			echo ""
 			exit
 		fi
@@ -141,7 +146,7 @@ do
 
 	if [ "$1" = "-u" ] || [ "$1" = "--user" ]
 	then
-		if [[ "$2" =~ [A-Za-z0-9]* ]]
+		if [[ "$2" =~ $rgx ]]
 		then
 			datauser=$2
 			required=$(($required+1))
@@ -149,8 +154,9 @@ do
 			shift
 		else
 			echo ""
-			echo "$incorrect_setup"$1
-			echo "$user_help_option"
+			echo $incorrect_setup
+			echo -e "${light_green}$1${neutral}"
+			echo $user_help_option
 			echo ""
 			exit
 		fi
@@ -166,15 +172,16 @@ do
 
 	if [ "$1" = "--ip" ]
 	then
-		if [[ "$2" =~ [a-zA-Z0-9]* ]] || [ "$2" != "" ]
+		if [[ "$2" =~ $rgxIP ]]
 		then
 			ip=$2
 			required=$(($required+1))
 			shift 2
 		else
 			echo ""
-			echo "$incorrect_setup"$1
-			echo "$user_help_option"
+			echo $incorrect_setup
+			echo -e "${light_green}$1${neutral}"
+			echo $user_help_option
 			echo ""
 			exit
 		fi
@@ -183,7 +190,7 @@ do
 
 	if [ "$1" = "-i" ]
 	then
-		if [[ "$2" =~ [a-zA-Z0-9]* ]] || [ "$2" != "" ]
+		if [[ "$2" =~ $rgx ]]
 		then
 			interfaces=$2
 			ip=$(ifconfig $interfaces | awk '/inet / {print $2}' | cut -d ':' -f2)
@@ -191,8 +198,9 @@ do
 			shift 2
 		else
 			echo ""
-			echo "$incorrect_setup"$1
-			echo "$user_help_option"
+			echo $incorrect_setup
+			echo -e "${light_green}$1${neutral}"
+			echo $user_help_option
 			echo ""
 			exit
 		fi
@@ -202,9 +210,9 @@ done
 if [ "$required" -lt 4 ]
 then
 	echo ""
-	echo "$option_required_blank"
-	echo "("$required "$option_requierd_blank1"
-	echo "$user_help_option"
+	echo $option_required_blank
+	echo "("$required $option_requierd_blank1
+	echo $user_help_option
 	echo ""
 	exit
 fi
@@ -212,13 +220,13 @@ fi
 echo ""
 echo "$summary"
 echo ""
-echo -e "$name_database"
+echo -e $name_database
 echo -e "${light_green}$dataname${neutral}"
-echo -e "$username"
+echo -e $username
 echo -e "${light_green}$datauser${neutral}"
-echo -e "$password"
+echo -e $password
 echo -e "${light_green}$datapdw${neutral}"
-echo -e "$resume_ip"
+echo -e $resume_ip
 echo -e "${light_green}$ip${neutral}"
 echo ""
 echo $correct_information
